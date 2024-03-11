@@ -1,0 +1,1 @@
+/bin/c++ -std=c++11 -Wall -Wnon-virtual-dtor  -O3 -DNDEBUG -rdynamic CMakeFiles/permeability.dir/permeability.cpp.o -o ../permeability  libpalabos.a -lmpicxx -lmpi -Wl,-Bstatic -lrt -lpthread -ldl -Wl,-Bdynamic 

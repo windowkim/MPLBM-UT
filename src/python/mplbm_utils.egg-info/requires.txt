@@ -1,0 +1,8 @@
+matplotlib
+numpy
+pandas
+porespy
+pyvista
+pyyaml
+scikit-image
+vedo

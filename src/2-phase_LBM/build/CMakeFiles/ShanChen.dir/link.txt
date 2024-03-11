@@ -1,0 +1,1 @@
+/bin/c++ -std=c++11 -Wall -Wnon-virtual-dtor  -O3 -DNDEBUG -rdynamic CMakeFiles/ShanChen.dir/ShanChen.cpp.o -o ../ShanChen  libpalabos.a -lmpicxx -lmpi -Wl,-Bstatic -lrt -lpthread -ldl -Wl,-Bdynamic 

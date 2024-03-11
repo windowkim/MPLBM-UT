@@ -1,0 +1,4 @@
+/mnt/data2/windowkim/hyundai/lbm/MPLBM-UT/src/1-phase_LBM/build/CMakeFiles/palabos.dir
+/mnt/data2/windowkim/hyundai/lbm/MPLBM-UT/src/1-phase_LBM/build/CMakeFiles/permeability.dir
+/mnt/data2/windowkim/hyundai/lbm/MPLBM-UT/src/1-phase_LBM/build/CMakeFiles/edit_cache.dir
+/mnt/data2/windowkim/hyundai/lbm/MPLBM-UT/src/1-phase_LBM/build/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,22 @@
+Metadata-Version: 2.1
+Name: mplbm-utils
+Version: 1.0
+Summary: Utilities for the MPLBM-UT lattice-Boltzmann simulator.
+Home-page: UNKNOWN
+Author: Alex Gigliotti and Javier Santos
+Author-email: alex.gigliotti@utexas.edu
+License: UNKNOWN
+Keywords: python,lattice boltzmann method,lattice boltzmann,digital rocks
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Science/Research
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+
+The mplbm_utils package contains all the pre- and post-processing utilities to run MPLBM-UT.
+
