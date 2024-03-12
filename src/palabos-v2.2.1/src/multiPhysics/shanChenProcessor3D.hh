@@ -375,8 +375,9 @@ void ShanChenPsiMultiComponentProcessor3D<T,Descriptor>::process (
                 }
 
                 // Computation of the interaction potential.
+                // using pseudo potential psi
                 for (plint iSpecies=0; iSpecies<numSpecies; ++iSpecies) {
-                    multiPhaseTemplates3D<T,Descriptor>::shanChenInteraction (
+                    multiPhaseTemplates3D<T,Descriptor>::shanChenPsiInteraction (
                             *lattices[iSpecies],rhoContribution[iSpecies],iX,iY,iZ );
                 }
 
@@ -387,20 +388,33 @@ void ShanChenPsiMultiComponentProcessor3D<T,Descriptor>::process (
                     Cell<T,Descriptor>& cell = lattices[iSpecies]->get(iX,iY,iZ);
                     T *momentum = cell.getExternal(momentumOffset);
                     for (int iD = 0; iD < D::d; ++iD) {
-                        momentum[iD] = uTot[iD];
+                        // momentum = rho * uTot - invOmega * forceContribution
+                        T rho = *cell.getExternal(densityOffset);
+                        momentum[iD] = rho * uTot[iD];
+
                         // Initialize force contribution with force from external fields if there
                         //   is any, or with zero otherwise.
                         T forceContribution = getExternalForceComponent(cell, iD);
+                        
                         // Then, add a contribution from the potential of all other species.
+                        // Multiply by psi to convert from velocity to momentum.
+                        // calculate pressure and psi
+                        // Carnahan-Starling EOS
+                        // a = 1, b = 4, R = 1, rho_crit = 0.13045, T_crit = 0.094330
+                        // ref: Stiles and Xue, 2016 Computers and Fluids
+                        // T a = 1
+                        // T b = 4
+                        // T R = 1
+                        // T k = b * rho / (T)4;
+                        T p = rho * Descriptor<T>::cs2 * ((T)1 + rho + std::pow(rho,2) - std::pow(rho,3)) / std::pow((1 - rho),3) - std::pow(rho,2);
+                        T psi = std::sqrt(2 * (p - Descriptor<T>::cs2 * rho) / (Descriptor<T>::cs2)); // calculate psi
                         for (plint iPartnerSpecies=0; iPartnerSpecies<numSpecies; ++iPartnerSpecies) {
                             if (iPartnerSpecies != iSpecies) {
-                                forceContribution -= speciesG[iSpecies * numSpecies + iPartnerSpecies] *
+                                forceContribution -= psi * speciesG[iSpecies * numSpecies + iPartnerSpecies] *
                                     rhoContribution[iPartnerSpecies][iD];
                             }
                         }
-                        momentum[iD] += invOmega[iSpecies]*forceContribution;
-                        // Multiply by rho to convert from velocity to momentum.
-                        momentum[iD] *= *cell.getExternal(densityOffset);
+                        momentum[iD] += invOmega[iSpecies] * forceContribution;
                     }
                 }
             }

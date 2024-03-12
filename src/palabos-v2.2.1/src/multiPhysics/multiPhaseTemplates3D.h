@@ -71,6 +71,41 @@ static void shanChenInteraction( BlockLattice3D<T,Descriptor>& lattice,
     }
 }
 
+static void shanChenPsiInteraction( BlockLattice3D<T,Descriptor>& lattice,
+                                 Array<T,Descriptor<T>::d>& rhoContribution,
+                                 plint iX, plint iY, plint iZ )
+{
+    enum {
+        densityOffset  = Descriptor<T>::ExternalField::densityBeginsAt
+    };
+                     
+    rhoContribution.resetToZero();
+    for (plint iPop = 0; iPop < Descriptor<T>::q; ++iPop) {
+        plint nextX = iX + Descriptor<T>::c[iPop][0];
+        plint nextY = iY + Descriptor<T>::c[iPop][1];
+        plint nextZ = iZ + Descriptor<T>::c[iPop][2];
+        Cell<T,Descriptor> const& cell = lattice.get(nextX,nextY,nextZ);
+        T rho = *cell.getExternal(densityOffset);
+        
+        // calculate pressure and psi
+        // Carnahan-Starling EOS
+        // a = 1, b = 4, R = 1, rho_crit = 0.13045, T_crit = 0.094330
+        // ref: Stiles and Xue, 2016 Computers and Fluids
+        // T a = 1
+        // T b = 4
+        // T R = 1
+        // T k = b * rho / (T)4;
+        T p = rho * Descriptor<T>::cs2 * ((T)1 + rho + std::pow(rho,2) - std::pow(rho,3)) / std::pow((1 - rho),3) - std::pow(rho,2);
+        T psi = std::sqrt(2 * (p - Descriptor<T>::cs2 * rho) / (Descriptor<T>::cs2)); // calculate psi
+
+        for (int iD = 0; iD < Descriptor<T>::d; ++iD) {
+           rhoContribution[iD] += Descriptor<T>::t[iPop] * psi * Descriptor<T>::c[iPop][iD];
+        }
+    }
+}
+
+
+
 static void shanChenInteraction( BlockLattice3D<T,Descriptor>& lattice,
                                  ScalarField3D<T>& rhoBar,
                                  Array<T,Descriptor<T>::d>& rhoContribution,
