@@ -616,7 +616,7 @@ int main(int argc, char * argv[]) {
   constOmegaValues.push_back(omega_f1);
   plint processorLevel = 1;
 
-  integrateProcessingFunctional(new ShanChenMultiComponentProcessor3D < T,
+  integrateProcessingFunctional(new ShanChenPsiMultiComponentProcessor3D < T,
     DESCRIPTOR > (G, constOmegaValues), Box3D(0, nx - 1, 0, ny - 1, 0, nz - 1),
     blockLattices, processorLevel);
 

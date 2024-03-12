@@ -91,7 +91,7 @@ public:
     ShanChenPsiMultiComponentProcessor3D(T G_, std::vector<T> const& imposedOmega_);
     ShanChenPsiMultiComponentProcessor3D(std::vector<std::vector<T> > const& speciesG_, std::vector<T> const& imposedOmega_);
     virtual void process(Box3D domain, std::vector<BlockLattice3D<T,Descriptor>*> lattices );
-    virtual ShanChenMultiComponentProcessor3D<T,Descriptor>* clone() const;
+    virtual ShanChenPsiMultiComponentProcessor3D<T,Descriptor>* clone() const;
     virtual void getTypeOfModification(std::vector<modif::ModifT>& modified) const;
 private:
     T G;
