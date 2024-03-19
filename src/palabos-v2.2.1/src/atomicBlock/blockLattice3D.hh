@@ -83,7 +83,7 @@ BlockLattice3D<T,Descriptor>::BlockLattice3D (
     //   in the constructor of BlockLatticeBase3D.
     std::vector<double> average, sum, max;
     std::vector<plint> intSum;
-    average.push_back(Descriptor<double>::rhoBar(1.));
+    average.push_back(Descriptor<double>::rhoBar(0.13045));
                             // default average rho to 1, to avoid division by
                             // zero in constRhoBGK and related models
     average.push_back(0.);  // default average uSqr to 0

@@ -320,6 +320,7 @@ void ShanChenPsiMultiComponentProcessor3D<T,Descriptor>::process (
                     momentTemplates<T,Descriptor>::get_j(cell,j);
                     *cell.getExternal(densityOffset) = Descriptor<T>::fullRho(rhoBar);
                     j.to_cArray(cell.getExternal(momentumOffset));
+                    // std::cout << "rho in external :" << *cell.getExternal(densityOffset) << std::endl;
                 }
             }
         }
@@ -348,6 +349,8 @@ void ShanChenPsiMultiComponentProcessor3D<T,Descriptor>::process (
 
     // Compute the interaction force between the species, and store it by
     //   means of a velocity correction in the external velocity field.
+    std::cout << "domain size: " << domain.x0 << " " << domain.x1 << " "
+     << domain.y0 << " " << domain.y1 << " " << domain.z0 << " " << domain.z1 << std::endl;
     for (plint iX=domain.x0; iX<=domain.x1; ++iX) {
         for (plint iY=domain.y0; iY<=domain.y1; ++iY) {
             for (plint iZ=domain.z0; iZ<=domain.z1; ++iZ) {
@@ -378,7 +381,7 @@ void ShanChenPsiMultiComponentProcessor3D<T,Descriptor>::process (
                 // using pseudo potential psi
                 for (plint iSpecies=0; iSpecies<numSpecies; ++iSpecies) {
                     multiPhaseTemplates3D<T,Descriptor>::shanChenPsiInteraction (
-                            *lattices[iSpecies],rhoContribution[iSpecies],iX,iY,iZ );
+                            *lattices[iSpecies],rhoContribution[iSpecies],iX,iY,iZ , speciesG[iSpecies]);
                 }
 
                 // Computation and storage of the final velocity, consisting
@@ -406,8 +409,10 @@ void ShanChenPsiMultiComponentProcessor3D<T,Descriptor>::process (
                         // T b = 4
                         // T R = 1
                         // T k = b * rho / (T)4;
-                        T p = rho * Descriptor<T>::cs2 * ((T)1 + rho + std::pow(rho,2) - std::pow(rho,3)) / std::pow((1 - rho),3) - std::pow(rho,2);
-                        T psi = std::sqrt(2 * (p - Descriptor<T>::cs2 * rho) / (Descriptor<T>::cs2)); // calculate psi
+                        // T p = rho * Descriptor<T>::cs2 * ((T)1 + rho + std::pow(rho,2) - std::pow(rho,3)) / std::pow((1 - rho),3) - std::pow(rho,2);
+                        // T psi = std::sqrt(2 * std::abs(p - Descriptor<T>::cs2 * rho) / (Descriptor<T>::cs2)); // calculate psi
+                        T rho_0 = 200.0;
+                        T psi = rho_0 * ((T)1 - std::exp(-rho/rho_0));
                         for (plint iPartnerSpecies=0; iPartnerSpecies<numSpecies; ++iPartnerSpecies) {
                             if (iPartnerSpecies != iSpecies) {
                                 forceContribution -= psi * speciesG[iSpecies * numSpecies + iPartnerSpecies] *

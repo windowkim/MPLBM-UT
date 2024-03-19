@@ -178,9 +178,13 @@ template<typename T, template<typename U> class Descriptor>
 void Dynamics<T,Descriptor>::computeEquilibria (
         Array<T,Descriptor<T>::q>& fEq,  T rhoBar, Array<T,Descriptor<T>::d> const& j, T jSqr, T thetaBar ) const
 {
+    T sum = 0;
     for (int iPop=0; iPop<Descriptor<T>::q; ++iPop) {
         fEq[iPop] = computeEquilibrium(iPop, rhoBar, j, jSqr, thetaBar);
+        sum += fEq[iPop];
     }
+    // std::cout.precision(6);
+    // std::cout << "sum f : " << sum << std::endl;
 }
 
 template<typename T, template<typename U> class Descriptor>

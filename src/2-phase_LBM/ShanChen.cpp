@@ -273,12 +273,14 @@ void PorousMediaSetup(MultiBlockLattice3D < T, DESCRIPTOR > & lattice_fluid1,
   if (pressure_bc == true) {
 
     // Inlet BC
+    std::cout << "inlet boundarydensity" << std::endl;
     boundaryCondition -> addPressureBoundary0N(inlet, lattice_fluid1);
     boundaryCondition -> addPressureBoundary0N(inlet, lattice_fluid2);
     setBoundaryDensity(lattice_fluid1, inlet, rho_f1_inlet); // rho_f1_inlet
     setBoundaryDensity(lattice_fluid2, inlet, rhoNoFluid); // rhoNoFluid
 
     // Outlet BC
+    std::cout << "outlet boundarydensity" << std::endl;
     boundaryCondition -> addPressureBoundary0P(outlet, lattice_fluid1);
     boundaryCondition -> addPressureBoundary0P(outlet, lattice_fluid2);
     setBoundaryDensity(lattice_fluid1, outlet, rhoNoFluid); // rhoNoFluid
@@ -320,25 +322,62 @@ void PorousMediaSetup(MultiBlockLattice3D < T, DESCRIPTOR > & lattice_fluid1,
 
     if (load_fluids_from_geom == false) {
 
-         initializeAtEquilibrium(lattice_fluid2, Box3D(nx1_f2 - 1, nx2_f2 - 1,
-            ny1_f2 - 1, ny2_f2 - 1,
-            nz1_f2 - 1, nz2_f2 - 1),
+         std::cout << "init f2 wall " << nx1_f2-1 << " "<< nx2_f2-1 << " "
+         << ny1_f2-1 << " "<< ny2_f2-1 << " "
+         << nz1_f2-1 << " "<< nz2_f2-1 << " " << std::endl;
+         initializeAtEquilibrium(lattice_fluid2, Box3D(nx1_f2-1, nx2_f2-1,
+            ny1_f2-1, ny2_f2,
+            nz1_f2-1, nz2_f2),
           rho_f2, zeroVelocity);
 
-        initializeAtEquilibrium(lattice_fluid1, Box3D(nx1_f2 - 1, nx2_f2 - 1,
-            ny1_f2 - 1, ny2_f2 - 1,
-            nz1_f2 - 1, nz2_f2 - 1),
+        std::cout << "init f1 wall" << nx1_f2-1 << " "<< nx2_f2-1 << " "
+         << ny1_f2-1 << " "<< ny2_f2-1 << " "
+         << nz1_f2-1 << " "<< nz2_f2-1 << " " << std::endl;
+        initializeAtEquilibrium(lattice_fluid1, Box3D(nx1_f2-1, nx2_f2-1,
+            ny1_f2-1, ny2_f2,
+            nz1_f2-1, nz2_f2),
           rhoNoFluid, zeroVelocity);
 
+        std::cout << "init f1" << nx1_f1 << " "<< nx2_f1 << " "
+         << ny1_f1 << " "<< ny2_f1 << " "
+         << nz1_f1 << " "<< nz2_f1 << " " << std::endl;
         initializeAtEquilibrium(lattice_fluid1, Box3D(nx1_f1, nx2_f1,
-            ny1_f1, ny2_f1,
-            nz1_f1, nz2_f1),
+            ny1_f1-1, ny2_f1,
+            nz1_f1-1, nz2_f1),
           rho_f1, zeroVelocity);
 
+        
+        
+
+        std::cout << "init f2 " << nx1_f1 << " "<< nx2_f1 << " "
+         << ny1_f1 << " "<< ny2_f1 << " "
+         << nz1_f1 << " "<< nz2_f1 << " " << std::endl;
+         std::cout << "rhoNoFluid : " << rhoNoFluid << std::endl;
         initializeAtEquilibrium(lattice_fluid2, Box3D(nx1_f1, nx2_f1,
-            ny1_f1, ny2_f1,
-            nz1_f1, nz2_f1),
+            ny1_f1-1, ny2_f1,
+            nz1_f1-1, nz2_f1),
           rhoNoFluid, zeroVelocity);
+
+        
+
+        std::cout << "rho init done" << std::endl;
+        
+    for (plint iX=0; iX<=6; ++iX) {
+            for (plint iY=0; iY<=74; ++iY) {
+                for (plint iZ=0; iZ<=74; ++iZ) {
+                  // pcout << DESCRIPTOR::ExternalField::densityBeginsAt << endl;
+                  pcout << "rho at (" << iX << "," << iY << "," << iZ << ")=" ;
+                  pcout << setprecision(6) << * computeDensity(lattice_fluid1, Box3D(iX, iX, iY, iY, iZ, iZ)) << endl;
+                  // Cell<T,DESCRIPTOR> const& cell = lattice_fluid1.get(iX ,iY ,iZ);
+                  // T rho = *cell.getExternal(0);
+                  // pcout << "rho at (" << iX << "," << iY << "," << iZ << ")=" << rho << endl;
+
+                }
+            }
+        }
+
+
+        
 
     } else {
         pcout << "Initialize fluid nodes from geom...";
@@ -350,9 +389,34 @@ void PorousMediaSetup(MultiBlockLattice3D < T, DESCRIPTOR > & lattice_fluid1,
       DESCRIPTOR < T > ::ExternalField::forceBeginsAt, Array < T, 3 > (force_f1, 0., 0.));
     setExternalVector(lattice_fluid2, lattice_fluid2.getBoundingBox(),
       DESCRIPTOR < T > ::ExternalField::forceBeginsAt, Array < T, 3 > (force_f2, 0., 0.));
+    std::cout << "setExternalVector done" << std::endl;
 
     lattice_fluid1.initialize();
     lattice_fluid2.initialize();
+
+    for (plint iX=0; iX<=6; ++iX) {
+            for (plint iY=0; iY<=74; ++iY) {
+                for (plint iZ=0; iZ<=74; ++iZ) {
+                  // pcout << DESCRIPTOR::ExternalField::densityBeginsAt << endl;
+                  pcout << "rho at (" << iX << "," << iY << "," << iZ << ")=" ;
+                  pcout << setprecision(6) << computeAverageDensity(lattice_fluid1, Box3D(iX, iX, iY, iY, iZ, iZ)) << endl;
+                  // Cell<T,DESCRIPTOR> const& cell = lattice_fluid1.get(iX ,iY ,iZ);
+                  // T rho = *cell.getExternal(0);
+                  // pcout << "rho at (" << iX << "," << iY << "," << iZ << ")=" << rho << endl;
+
+                }
+            }
+        }
+
+    for (plint i = 0; i < nx2_f1; i++){
+        // Cell<T,DESCRIPTOR> cell = lattice_fluid1.get(i,ny1_f1/2,nz1_f1/2);
+        std::cout << "rho in f1[" << i << ",ny1_f1,nz1_f1] :" << (T)*lattice_fluid1.get(i,ny1_f1/2,nz1_f1/2).getExternal(DESCRIPTOR<T>::ExternalField::densityBeginsAt) << std::endl;
+        }
+    for (plint i = 0; i < nx2_f2; i++){
+    // Cell<T,DESCRIPTOR> cell = lattice_fluid2.get(i,ny1_f2/2,nz1_f2/2);
+    std::cout << "rho in f2[" << i << ",ny1_f2,nz1_f2] :" << (T)*lattice_fluid2.get(i,ny1_f2/2,nz1_f2/2).getExternal(DESCRIPTOR<T>::ExternalField::densityBeginsAt) << std::endl;
+    }
+    std::cout << "PorousMediaSetup done" << std::endl;
   }
 
   // Output geometry dynamics
@@ -539,8 +603,8 @@ int main(int argc, char * argv[]) {
   
   global::directories().setOutputDir(fNameOut);
 
-  T rho_fluid1[runnum];
-  T rho_fluid2[runnum];
+  T rho_fluid1[runnum+1] = {0};
+  T rho_fluid2[runnum+1] = {0};
   T deltaP[runnum];
   T new_avg_f1;
   T new_avg_f2;
@@ -572,6 +636,7 @@ int main(int argc, char * argv[]) {
     // Calculating capillary pressure steps
     T cos_theta = abs(4*Gads_f1_s1/(G*(rho_f1_inlet - rhoNoFluid))); // Taking absolute value so that the difference in density is always positive
     T sigma = 0.15; // tuning parameter from docs
+    // T sigma = 0.0015; // custom value from windowkim
     T delta_rho = 6*sigma*cos_theta/min_radius;
     T step_size = (rho_f2_outlet_initial - (rho_f2_outlet_initial-delta_rho))/num_pc_steps; // To calculate densities in the for loop
     
@@ -636,8 +701,8 @@ int main(int argc, char * argv[]) {
   MultiScalarField3D < int > geometry(nx, ny, nz);
   readGeometry(fNameIn, fNameOut, geometry);
 
-  Box3D inlet(1, 2, 1, ny - 2, 1, nz - 2);
-  Box3D outlet(nx - 2, nx - 1, 1, ny - 2, 1, nz - 2);
+  Box3D inlet(0, 2, 0, ny - 1, 0, nz - 1);
+  Box3D outlet(nx - 2, nx - 1, 0, ny - 1, 0, nz - 1);
 
   // Setup or load fluid lattices
   plint current_run_num = 0;
