@@ -322,59 +322,80 @@ void PorousMediaSetup(MultiBlockLattice3D < T, DESCRIPTOR > & lattice_fluid1,
 
     if (load_fluids_from_geom == false) {
 
-         std::cout << "init f2 wall " << nx1_f2-1 << " "<< nx2_f2-1 << " "
-         << ny1_f2-1 << " "<< ny2_f2-1 << " "
-         << nz1_f2-1 << " "<< nz2_f2-1 << " " << std::endl;
-         initializeAtEquilibrium(lattice_fluid2, Box3D(nx1_f2-1, nx2_f2-1,
-            ny1_f2-1, ny2_f2,
-            nz1_f2-1, nz2_f2),
-          rho_f2, zeroVelocity);
 
-        std::cout << "init f1 wall" << nx1_f2-1 << " "<< nx2_f2-1 << " "
-         << ny1_f2-1 << " "<< ny2_f2-1 << " "
-         << nz1_f2-1 << " "<< nz2_f2-1 << " " << std::endl;
-        initializeAtEquilibrium(lattice_fluid1, Box3D(nx1_f2-1, nx2_f2-1,
-            ny1_f2-1, ny2_f2,
-            nz1_f2-1, nz2_f2),
-          rhoNoFluid, zeroVelocity);
 
-        std::cout << "init f1" << nx1_f1 << " "<< nx2_f1 << " "
-         << ny1_f1 << " "<< ny2_f1 << " "
-         << nz1_f1 << " "<< nz2_f1 << " " << std::endl;
-        initializeAtEquilibrium(lattice_fluid1, Box3D(nx1_f1, nx2_f1,
-            ny1_f1-1, ny2_f1,
-            nz1_f1-1, nz2_f1),
-          rho_f1, zeroVelocity);
+            initializeAtEquilibrium(lattice_fluid1, Box3D(nx1_f2, nx2_f2,
+              ny1_f2, ny2_f2,
+              nz1_f2, nz2_f2),
+            rhoNoFluid, zeroVelocity);
+            initializeAtEquilibrium(lattice_fluid2, Box3D(nx1_f2, nx2_f2,
+              ny1_f2, ny2_f2,
+              nz1_f2, nz2_f2),
+            rho_f2, zeroVelocity);
+
+            initializeAtEquilibrium(lattice_fluid1, Box3D(nx1_f1, nx2_f1,
+              ny1_f1, ny2_f1,
+              nz1_f1, nz2_f1),
+            rho_f1, zeroVelocity);
+            initializeAtEquilibrium(lattice_fluid2, Box3D(nx1_f1, nx2_f1,
+              ny1_f1, ny2_f1,
+              nz1_f1, nz2_f1),
+            rhoNoFluid, zeroVelocity);
+
+
+        //  std::cout << "init f2 wall " << nx1_f2-1 << " "<< nx2_f2-1 << " "
+        //  << ny1_f2-1 << " "<< ny2_f2-1 << " "
+        //  << nz1_f2-1 << " "<< nz2_f2-1 << " " << std::endl;
+        //  initializeAtEquilibrium(lattice_fluid2, Box3D(nx1_f2-1, nx2_f2-1,
+        //     ny1_f2-1, ny2_f2,
+        //     nz1_f2-1, nz2_f2),
+        //   rho_f2, zeroVelocity);
+
+        // std::cout << "init f1 wall" << nx1_f2-1 << " "<< nx2_f2-1 << " "
+        //  << ny1_f2-1 << " "<< ny2_f2-1 << " "
+        //  << nz1_f2-1 << " "<< nz2_f2-1 << " " << std::endl;
+        // initializeAtEquilibrium(lattice_fluid1, Box3D(nx1_f2-1, nx2_f2-1,
+        //     ny1_f2-1, ny2_f2,
+        //     nz1_f2-1, nz2_f2),
+        //   rhoNoFluid, zeroVelocity);
+
+        // std::cout << "init f1" << nx1_f1 << " "<< nx2_f1 << " "
+        //  << ny1_f1 << " "<< ny2_f1 << " "
+        //  << nz1_f1 << " "<< nz2_f1 << " " << std::endl;
+        // initializeAtEquilibrium(lattice_fluid1, Box3D(nx1_f1, nx2_f1,
+        //     ny1_f1-1, ny2_f1,
+        //     nz1_f1-1, nz2_f1),
+        //   rho_f1, zeroVelocity);
 
         
         
 
-        std::cout << "init f2 " << nx1_f1 << " "<< nx2_f1 << " "
-         << ny1_f1 << " "<< ny2_f1 << " "
-         << nz1_f1 << " "<< nz2_f1 << " " << std::endl;
-         std::cout << "rhoNoFluid : " << rhoNoFluid << std::endl;
-        initializeAtEquilibrium(lattice_fluid2, Box3D(nx1_f1, nx2_f1,
-            ny1_f1-1, ny2_f1,
-            nz1_f1-1, nz2_f1),
-          rhoNoFluid, zeroVelocity);
+        // std::cout << "init f2 " << nx1_f1 << " "<< nx2_f1 << " "
+        //  << ny1_f1 << " "<< ny2_f1 << " "
+        //  << nz1_f1 << " "<< nz2_f1 << " " << std::endl;
+        //  std::cout << "rhoNoFluid : " << rhoNoFluid << std::endl;
+        // initializeAtEquilibrium(lattice_fluid2, Box3D(nx1_f1, nx2_f1,
+        //     ny1_f1-1, ny2_f1,
+        //     nz1_f1-1, nz2_f1),
+        //   rhoNoFluid, zeroVelocity);
 
         
 
         std::cout << "rho init done" << std::endl;
         
-    for (plint iX=0; iX<=6; ++iX) {
-            for (plint iY=0; iY<=74; ++iY) {
-                for (plint iZ=0; iZ<=74; ++iZ) {
-                  // pcout << DESCRIPTOR::ExternalField::densityBeginsAt << endl;
-                  pcout << "rho at (" << iX << "," << iY << "," << iZ << ")=" ;
-                  pcout << setprecision(6) << * computeDensity(lattice_fluid1, Box3D(iX, iX, iY, iY, iZ, iZ)) << endl;
-                  // Cell<T,DESCRIPTOR> const& cell = lattice_fluid1.get(iX ,iY ,iZ);
-                  // T rho = *cell.getExternal(0);
-                  // pcout << "rho at (" << iX << "," << iY << "," << iZ << ")=" << rho << endl;
+    // for (plint iX=0; iX<=6; ++iX) {
+    //         for (plint iY=0; iY<=74; ++iY) {
+    //             for (plint iZ=0; iZ<=74; ++iZ) {
+    //               // pcout << DESCRIPTOR::ExternalField::densityBeginsAt << endl;
+    //               pcout << "rho at (" << iX << "," << iY << "," << iZ << ")=" ;
+    //               pcout << setprecision(6) << * computeDensity(lattice_fluid1, Box3D(iX, iX, iY, iY, iZ, iZ)) << endl;
+    //               // Cell<T,DESCRIPTOR> const& cell = lattice_fluid1.get(iX ,iY ,iZ);
+    //               // T rho = *cell.getExternal(0);
+    //               // pcout << "rho at (" << iX << "," << iY << "," << iZ << ")=" << rho << endl;
 
-                }
-            }
-        }
+    //             }
+    //         }
+    //     }
 
 
         
@@ -394,19 +415,19 @@ void PorousMediaSetup(MultiBlockLattice3D < T, DESCRIPTOR > & lattice_fluid1,
     lattice_fluid1.initialize();
     lattice_fluid2.initialize();
 
-    for (plint iX=0; iX<=6; ++iX) {
-            for (plint iY=0; iY<=74; ++iY) {
-                for (plint iZ=0; iZ<=74; ++iZ) {
-                  // pcout << DESCRIPTOR::ExternalField::densityBeginsAt << endl;
-                  pcout << "rho at (" << iX << "," << iY << "," << iZ << ")=" ;
-                  pcout << setprecision(6) << computeAverageDensity(lattice_fluid1, Box3D(iX, iX, iY, iY, iZ, iZ)) << endl;
-                  // Cell<T,DESCRIPTOR> const& cell = lattice_fluid1.get(iX ,iY ,iZ);
-                  // T rho = *cell.getExternal(0);
-                  // pcout << "rho at (" << iX << "," << iY << "," << iZ << ")=" << rho << endl;
+    // for (plint iX=0; iX<=6; ++iX) {
+    //         for (plint iY=0; iY<=74; ++iY) {
+    //             for (plint iZ=0; iZ<=74; ++iZ) {
+    //               // pcout << DESCRIPTOR::ExternalField::densityBeginsAt << endl;
+    //               pcout << "rho at (" << iX << "," << iY << "," << iZ << ")=" ;
+    //               pcout << setprecision(6) << computeAverageDensity(lattice_fluid1, Box3D(iX, iX, iY, iY, iZ, iZ)) << endl;
+    //               // Cell<T,DESCRIPTOR> const& cell = lattice_fluid1.get(iX ,iY ,iZ);
+    //               // T rho = *cell.getExternal(0);
+    //               // pcout << "rho at (" << iX << "," << iY << "," << iZ << ")=" << rho << endl;
 
-                }
-            }
-        }
+    //             }
+    //         }
+    //     }
 
     for (plint i = 0; i < nx2_f1; i++){
         // Cell<T,DESCRIPTOR> cell = lattice_fluid1.get(i,ny1_f1/2,nz1_f1/2);
@@ -466,6 +487,9 @@ int main(int argc, char * argv[]) {
   plint nx1_f2, nx2_f2, ny1_f2, ny2_f2, nz1_f2, nz2_f2; //fluid2 configuration
 
   T G;
+  std::vector<std::vector<T> > speciesG;
+  std::vector<T> G_w(2);
+  std::vector<T> G_o(2);
   T omega_f1;
   T omega_f2;
   T force_f1;
@@ -540,7 +564,13 @@ int main(int argc, char * argv[]) {
     document["init"]["fluid2"]["z1"].read(nz1_f2);
     document["init"]["fluid2"]["z2"].read(nz2_f2);
 
-    document["fluids"]["Gc"].read(G);
+
+    document["fluids"]["G_ww"].read(G_w[0]);
+    document["fluids"]["G_oo"].read(G_o[1]);
+    document["fluids"]["G_ow"].read(G_w[1]);
+    document["fluids"]["G_ow"].read(G_o[0]);
+    speciesG.push_back(G_w);
+    speciesG.push_back(G_o);
     document["fluids"]["omega_f1"].read(omega_f1);
     document["fluids"]["omega_f2"].read(omega_f2);
 
@@ -634,7 +664,7 @@ int main(int argc, char * argv[]) {
   if (pressure_bc == true){
     
     // Calculating capillary pressure steps
-    T cos_theta = abs(4*Gads_f1_s1/(G*(rho_f1_inlet - rhoNoFluid))); // Taking absolute value so that the difference in density is always positive
+    T cos_theta = abs(4*Gads_f1_s1/(G_o[0]*(rho_f1_inlet - rhoNoFluid))); // Taking absolute value so that the difference in density is always positive
     T sigma = 0.15; // tuning parameter from docs
     // T sigma = 0.0015; // custom value from windowkim
     T delta_rho = 6*sigma*cos_theta/min_radius;
@@ -676,14 +706,27 @@ int main(int argc, char * argv[]) {
   blockLattices.push_back( & lattice_fluid2);
   blockLattices.push_back( & lattice_fluid1);
 
+  // vector < MultiBlockLattice3D < T, DESCRIPTOR > * > blockLattices1;
+  // blockLattices1.push_back( & lattice_fluid1);
+  // vector < MultiBlockLattice3D < T, DESCRIPTOR > * > blockLattices2;
+  // blockLattices2.push_back( & lattice_fluid2);
+
   std::vector < T > constOmegaValues;
   constOmegaValues.push_back(omega_f2);
   constOmegaValues.push_back(omega_f1);
   plint processorLevel = 1;
 
   integrateProcessingFunctional(new ShanChenPsiMultiComponentProcessor3D < T,
-    DESCRIPTOR > (G, constOmegaValues), Box3D(0, nx - 1, 0, ny - 1, 0, nz - 1),
+    DESCRIPTOR > (speciesG, constOmegaValues), Box3D(0, nx - 1, 0, ny - 1, 0, nz - 1),
     blockLattices, processorLevel);
+
+  // integrateProcessingFunctional(new ShanChenPsiMultiComponentProcessor3D < T,
+  //   DESCRIPTOR > (G+(T)1, constOmegaValues), Box3D(0, nx - 1, 0, ny - 1, 0, nz - 1),
+  //   blockLattices1, processorLevel);
+
+  // integrateProcessingFunctional(new ShanChenPsiMultiComponentProcessor3D < T,
+  //   DESCRIPTOR > (G, constOmegaValues), Box3D(0, nx - 1, 0, ny - 1, 0, nz - 1),
+  //   blockLattices2, processorLevel);
 
   pcout << "The convergence set by the user is = " << convergence << endl;
 
@@ -991,7 +1034,10 @@ int main(int argc, char * argv[]) {
   ofile << "Kinematic viscosity f2 = " << nu_f2 << "\n" << endl;
   ofile << "Gads_f1_s1 = " << Gads_f1_s1 << "\n" << endl;
   ofile << "Gads_f1_s2 = " << Gads_f1_s2 << "\n" << endl;
-  ofile << "Gc = " << G << "\n" << endl;
+  // ofile << "Gc = " << G << "\n" << endl;
+  ofile << "G_ww = " << G_w[0] << "\n" << endl;
+  ofile << "G_oo = " << G_o[1] << "\n" << endl;
+  ofile << "G_ow = " << G_o[0] << "\n" << endl;
   ofile << "Dissolved density = " << rhoNoFluid << "\n" << endl;
   ofile << "Inlet density = " << rho_f1_inlet << "\n" << endl;
   ofile << "Geometry flow length = " << nx << "\n" << endl;

@@ -257,6 +257,22 @@ def parse_input_file(input_file):
                 pass
             else:
                 raise KeyError("Please add 'Gc' to 'fluid data' under 'simulation' entry.")
+            
+            if 'G_ww' in inputs['simulation']['fluid data']:
+                pass
+            else:
+                raise KeyError("Please add 'G_ww' to 'fluid data' under 'simulation' entry.")
+            
+            if 'G_oo' in inputs['simulation']['fluid data']:
+                pass
+            else:
+                raise KeyError("Please add 'G_oo' to 'fluid data' under 'simulation' entry.")
+            
+            if 'G_ow' in inputs['simulation']['fluid data']:
+                pass
+            else:
+                raise KeyError("Please add 'G_opw' to 'fluid data' under 'simulation' entry.")
+
 
             if 'omega_f1' in inputs['simulation']['fluid data']:
                 pass

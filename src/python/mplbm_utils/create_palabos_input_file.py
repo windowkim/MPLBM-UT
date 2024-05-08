@@ -108,6 +108,7 @@ def create_two_phase_input_file(inputs, input_file_name):
 
     rho_f1 = inputs['simulation']['rho_f1']
     rho_f2 = inputs['simulation']['rho_f2']
+    rho_d = inputs['simulation']['rhoNoFluid']
 
     force_f1 = inputs['simulation']['force_f1']
     force_f2 = inputs['simulation']['force_f2']
@@ -140,6 +141,9 @@ def create_two_phase_input_file(inputs, input_file_name):
     fluid2_z2 = inputs['simulation']['fluid 2 init']['z2']
 
     Gc = inputs['simulation']['fluid data']['Gc']
+    G_ww = inputs['simulation']['fluid data']['G_ww']
+    G_oo = inputs['simulation']['fluid data']['G_oo']
+    G_ow = inputs['simulation']['fluid data']['G_ow']
     omega_f1 = inputs['simulation']['fluid data']['omega_f1']
     omega_f2 = inputs['simulation']['fluid data']['omega_f2']
     G_ads_f1_s1 = inputs['simulation']['fluid data']['G_ads_f1_s1']
@@ -205,8 +209,11 @@ def create_two_phase_input_file(inputs, input_file_name):
 
     # Write fluid data
     file.write('<fluids>\n')
-
+        
     file.write(f'\t<Gc> {Gc} </Gc>\n')
+    file.write(f'\t<G_ww> {G_ww} </G_ww>\n')
+    file.write(f'\t<G_oo> {G_oo} </G_oo>\n')
+    file.write(f'\t<G_ow> {G_ow} </G_ow>\n')
     file.write(f'\t<omega_f1> {omega_f1} </omega_f1>\n')
     file.write(f'\t<omega_f2> {omega_f2} </omega_f2>\n')
     file.write(f'\t<force_f1> {force_f1} </force_f1>\n')
@@ -224,7 +231,7 @@ def create_two_phase_input_file(inputs, input_file_name):
     file.write(f'\t<rho_f2_i> {rho_f2} </rho_f2_i>\n')
     file.write(f'\t<num_pc_steps> {num_pc_steps} </num_pc_steps>\n')
     file.write(f'\t<min_radius> {minimum_radius} </min_radius>\n')
-    file.write(f'\t<rho_d> 0.06 </rho_d>\n')
+    file.write(f'\t<rho_d> {rho_d} </rho_d>\n')
 
     file.write('</fluids>\n\n')
 

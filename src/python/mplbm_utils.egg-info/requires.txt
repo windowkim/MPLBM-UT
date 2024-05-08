@@ -1,8 +1,8 @@
-matplotlib
-numpy
-pandas
 porespy
-pyvista
+numpy
 pyyaml
-scikit-image
 vedo
+pyvista
+matplotlib
+scikit-image
+pandas

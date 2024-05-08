@@ -294,6 +294,12 @@ void ShanChenPsiMultiComponentProcessor3D<T,Descriptor>::process (
 {
     // Number of species (or components) which are coupled in this Shan/Chen multi-component fluid.
     plint numSpecies = (plint) lattices.size();
+
+
+    // std::cout << "numSpecies" << numSpecies << std::endl;
+    // exit(0);
+
+
     // Short-hand notation for the lattice descriptor
     typedef Descriptor<T> D;
     // Handle to external scalars
@@ -349,8 +355,8 @@ void ShanChenPsiMultiComponentProcessor3D<T,Descriptor>::process (
 
     // Compute the interaction force between the species, and store it by
     //   means of a velocity correction in the external velocity field.
-    std::cout << "domain size: " << domain.x0 << " " << domain.x1 << " "
-     << domain.y0 << " " << domain.y1 << " " << domain.z0 << " " << domain.z1 << std::endl;
+    // std::cout << "domain size: " << domain.x0 << " " << domain.x1 << " "
+    //  << domain.y0 << " " << domain.y1 << " " << domain.z0 << " " << domain.z1 << std::endl;
     for (plint iX=domain.x0; iX<=domain.x1; ++iX) {
         for (plint iY=domain.y0; iY<=domain.y1; ++iY) {
             for (plint iZ=domain.z0; iZ<=domain.z1; ++iZ) {
@@ -379,15 +385,22 @@ void ShanChenPsiMultiComponentProcessor3D<T,Descriptor>::process (
 
                 // Computation of the interaction potential.
                 // using pseudo potential psi
+
+                // G_ww 일때 rhoContribution 계산
+                
+                
                 for (plint iSpecies=0; iSpecies<numSpecies; ++iSpecies) {
+                    T G_ww = 1;
+                    if (iSpecies == 0) { G_ww = speciesG[0]; }
                     multiPhaseTemplates3D<T,Descriptor>::shanChenPsiInteraction (
-                            *lattices[iSpecies],rhoContribution[iSpecies],iX,iY,iZ , speciesG[iSpecies]);
+                            *lattices[iSpecies],rhoContribution[iSpecies],iX,iY,iZ , G_ww);
                 }
 
                 // Computation and storage of the final velocity, consisting
                 //   of uTot plus the momentum difference due to interaction
                 //   potential and external force
                 for (plint iSpecies=0; iSpecies<numSpecies; ++iSpecies) {
+
                     Cell<T,Descriptor>& cell = lattices[iSpecies]->get(iX,iY,iZ);
                     T *momentum = cell.getExternal(momentumOffset);
                     for (int iD = 0; iD < D::d; ++iD) {
@@ -401,24 +414,67 @@ void ShanChenPsiMultiComponentProcessor3D<T,Descriptor>::process (
                         
                         // Then, add a contribution from the potential of all other species.
                         // Multiply by psi to convert from velocity to momentum.
-                        // calculate pressure and psi
-                        // Carnahan-Starling EOS
-                        // a = 1, b = 4, R = 1, rho_crit = 0.13045, T_crit = 0.094330
-                        // ref: Stiles and Xue, 2016 Computers and Fluids
-                        // T a = 1
-                        // T b = 4
-                        // T R = 1
-                        // T k = b * rho / (T)4;
-                        // T p = rho * Descriptor<T>::cs2 * ((T)1 + rho + std::pow(rho,2) - std::pow(rho,3)) / std::pow((1 - rho),3) - std::pow(rho,2);
-                        // T psi = std::sqrt(2 * std::abs(p - Descriptor<T>::cs2 * rho) / (Descriptor<T>::cs2)); // calculate psi
-                        T rho_0 = 200.0;
-                        T psi = rho_0 * ((T)1 - std::exp(-rho/rho_0));
-                        for (plint iPartnerSpecies=0; iPartnerSpecies<numSpecies; ++iPartnerSpecies) {
-                            if (iPartnerSpecies != iSpecies) {
-                                forceContribution -= psi * speciesG[iSpecies * numSpecies + iPartnerSpecies] *
-                                    rhoContribution[iPartnerSpecies][iD];
+
+                        if (iSpecies == 1){ // Oxygen
+                            for (plint iPartnerSpecies=0; iPartnerSpecies<numSpecies; ++iPartnerSpecies) {
+                                if (iPartnerSpecies != iSpecies) {
+                                    forceContribution -= rho * speciesG[iSpecies * numSpecies + iPartnerSpecies] *
+                                        rhoContribution[iPartnerSpecies][iD];
+                                }
                             }
+                            // if(iX == 50 && iY == 50)
+                            // {
+                            //     std::cout << "rhoContribution[" << iSpecies << "][" << iD << "] :" << rhoContribution[iSpecies][iD] << std::endl;
+                            // }
+                            
+
                         }
+                        else{ // water
+                            // calculate pressure and psi
+                            // Carnahan-Starling EOS
+                            // a = 1, b = 4, R = 1, rho_crit = 0.13045, T_crit = 0.094330
+                            // ref: Stiles and Xue, 2016 Computers and Fluids
+                            T a = (T)0.1935948;
+                            T b = (T)0.0016464;
+                            // T R = (T)1;
+                            T beta;
+                            // T k = b * rho / (T)4;
+                            beta = b * rho / (T)4;
+                            T p = rho * D::cs2 * ((T)1 + beta + std::pow(beta,2) - std::pow(beta,3)) / std::pow((1 - beta),3) - a * std::pow(rho,2);
+                            T psi = std::sqrt(std::abs(2 * (p - D::cs2 * rho) / (D::cs2 * speciesG[0]))); // calculate psi
+                            
+                            // van der Waals eqn params
+                            T c1 = (T)1;
+                            T c2 = (T)1;
+                            T c3 = (T)0.45;
+                            T c4 = (T)0.1;
+                            // van der Waals eqn
+                            psi = std::sqrt(std::abs(c1 * rho - (c2/rho)/(1 - c4*rho) + c3*rho*rho)); 
+                            // psi = rho;
+
+                            // if(iX == 50 && iY == 50)
+                            // {std::cout << "psi : " << psi << std::endl;
+                            // std::cout << "rhoContribution[" << iSpecies << "][" << iD << "] :" << rhoContribution[iSpecies][iD] << std::endl;
+                            // }
+                            // exit(0);
+                            // std::cout << "inside sqrt : " << 2 * (p - D::cs2 * rho) / (D::cs2 * speciesG[0]) << std::endl;
+                            // std::cout << "G_ww : " << speciesG[0] << std::endl;
+                            for (plint iPartnerSpecies=0; iPartnerSpecies<numSpecies; ++iPartnerSpecies) {
+                                if (iPartnerSpecies != iSpecies) {
+                                    forceContribution -= psi * speciesG[iSpecies * numSpecies + iPartnerSpecies] *
+                                        rhoContribution[iPartnerSpecies][iD];
+
+                                    if (iSpecies == 1) {
+                                    forceContribution -= psi * speciesG[0] *
+                                        rhoContribution[iSpecies][iD];
+                                    }
+                                }
+                            }
+                            // if(iX == 50 && iY == 50)
+                            // {std::cout << "forceContribution[" << iSpecies << "] :" << forceContribution << std::endl;
+                            // }
+                        }
+
                         momentum[iD] += invOmega[iSpecies] * forceContribution;
                     }
                 }

@@ -193,6 +193,506 @@ static void shanChenInteraction (
 }
 
 
+
+static void shanChenPsiInteraction (
+        BlockLattice3D<T,descriptors::ForcedShanChenD3Q19Descriptor>& lattice,
+        Array<T,D::d>& rhoContribution,
+        plint iX, plint iY, plint iZ,
+        T G_ww )
+{
+
+    enum {
+        densityOffset  = D::ExternalField::densityBeginsAt
+    };
+
+    T rho;
+    T p;
+    T psi;
+    T beta;
+    T w_1 = (T)2/(T)15;
+    T w_2 = (T)1/(T)15;
+    // calculate pressure and psi
+
+
+    if (G_ww != 1){
+    // Carnahan-Starling EOS
+    // a = 1, b = 4, R = 1, rho_crit = 0.13045, T_crit = 0.094330
+    // ref: Stiles and Xue, 2016 Computers and Fluids
+    T a = (T)0.1935948;
+    T b = (T)0.0016464;
+    // T R = (T)1;
+    // T k = b * rho / (T)4;
+
+    // van der Waals eqn params
+    T c1 = (T)1;
+    T c2 = (T)1;
+    T c3 = (T)0.45;
+    T c4 = (T)0.1;
+
+    rho = *lattice.get(iX-1,iY  ,iZ  ).getExternal(densityOffset);
+    // beta = b * rho / (T)4;
+    // p = rho * D::cs2 * ((T)1 + beta + std::pow(beta,2) - std::pow(beta,3)) / std::pow((1 - beta),3) - a * std::pow(rho,2);
+    // psi = std::sqrt(std::abs(2 * (p - D::cs2 * rho) / (D::cs2 * G_ww))); // calculate psi
+    // van der Waals eqn
+    psi = std::sqrt(std::abs(c1 * rho - (c2/rho)/(1 - c4*rho) + c3*rho*rho)); 
+    // psi = rho;
+
+    rhoContribution[0] = - w_1 * psi;
+
+    rho = *lattice.get(iX  ,iY-1,iZ  ).getExternal(densityOffset);
+    // beta = b * rho / (T)4;
+    // p = rho * D::cs2 * ((T)1 + beta + std::pow(beta,2) - std::pow(beta,3)) / std::pow((1 - beta),3) - a * std::pow(rho,2);
+    // psi = std::sqrt(std::abs(2 * (p - D::cs2 * rho) / (D::cs2 * G_ww))); // calculate psi
+    // van der Waals eqn
+    psi = std::sqrt(std::abs(c1 * rho - (c2/rho)/(1 - c4*rho) + c3*rho*rho)); 
+    // psi = rho;
+
+    rhoContribution[1] = - w_1 * psi;
+
+    rho = *lattice.get(iX  ,iY  ,iZ-1).getExternal(densityOffset);
+    // beta = b * rho / (T)4;
+    // p = rho * D::cs2 * ((T)1 + beta + std::pow(beta,2) - std::pow(beta,3)) / std::pow((1 - beta),3) - a * std::pow(rho,2);
+    // psi = std::sqrt(std::abs(2 * (p - D::cs2 * rho) / (D::cs2 * G_ww))); // calculate psi
+    // van der Waals eqn
+    psi = std::sqrt(std::abs(c1 * rho - (c2/rho)/(1 - c4*rho) + c3*rho*rho)); 
+    // psi = rho;
+
+    rhoContribution[2] = - w_1 * psi;
+
+    rho = *lattice.get(iX-1,iY-1,iZ  ).getExternal(densityOffset);
+    // beta = b * rho / (T)4;
+    // p = rho * D::cs2 * ((T)1 + beta + std::pow(beta,2) - std::pow(beta,3)) / std::pow((1 - beta),3) - a * std::pow(rho,2);
+    // psi = std::sqrt(std::abs(2 * (p - D::cs2 * rho) / (D::cs2 * G_ww))); // calculate psi
+    // van der Waals eqn
+    psi = std::sqrt(std::abs(c1 * rho - (c2/rho)/(1 - c4*rho) + c3*rho*rho)); 
+    // psi = rho;
+
+    rhoContribution[0] -=  w_2 * psi;
+    rhoContribution[1] -=  w_2 * psi;
+
+    rho = *lattice.get(iX-1,iY+1,iZ  ).getExternal(densityOffset);
+    // beta = b * rho / (T)4;
+    // p = rho * D::cs2 * ((T)1 + beta + std::pow(beta,2) - std::pow(beta,3)) / std::pow((1 - beta),3) - a * std::pow(rho,2);
+    // psi = std::sqrt(std::abs(2 * (p - D::cs2 * rho) / (D::cs2 * G_ww))); // calculate psi
+    // van der Waals eqn
+    psi = std::sqrt(std::abs(c1 * rho - (c2/rho)/(1 - c4*rho) + c3*rho*rho)); 
+    // psi = rho;
+
+    rhoContribution[0] -=  w_2 * psi;
+    rhoContribution[1] +=  w_2 * psi;
+
+    rho = *lattice.get(iX-1,iY  ,iZ-1).getExternal(densityOffset);
+    // beta = b * rho / (T)4;
+    // p = rho * D::cs2 * ((T)1 + beta + std::pow(beta,2) - std::pow(beta,3)) / std::pow((1 - beta),3) - a * std::pow(rho,2);
+    // psi = std::sqrt(std::abs(2 * (p - D::cs2 * rho) / (D::cs2 * G_ww))); // calculate psi
+    // van der Waals eqn
+    psi = std::sqrt(std::abs(c1 * rho - (c2/rho)/(1 - c4*rho) + c3*rho*rho)); 
+    // psi = rho;
+
+    rhoContribution[0] -=  w_2 * psi;
+    rhoContribution[2] -=  w_2 * psi;
+
+    rho = *lattice.get(iX-1,iY  ,iZ+1).getExternal(densityOffset);
+    // beta = b * rho / (T)4;
+    // p = rho * D::cs2 * ((T)1 + beta + std::pow(beta,2) - std::pow(beta,3)) / std::pow((1 - beta),3) - a * std::pow(rho,2);
+    // psi = std::sqrt(std::abs(2 * (p - D::cs2 * rho) / (D::cs2 * G_ww))); // calculate psi
+    // van der Waals eqn
+    psi = std::sqrt(std::abs(c1 * rho - (c2/rho)/(1 - c4*rho) + c3*rho*rho)); 
+    // psi = rho;
+
+    rhoContribution[0] -=  w_2 * psi;
+    rhoContribution[2] +=  w_2 * psi;
+
+    rho = *lattice.get(iX  ,iY-1,iZ-1).getExternal(densityOffset);
+    // beta = b * rho / (T)4;
+    // p = rho * D::cs2 * ((T)1 + beta + std::pow(beta,2) - std::pow(beta,3)) / std::pow((1 - beta),3) - a * std::pow(rho,2);
+    // psi = std::sqrt(std::abs(2 * (p - D::cs2 * rho) / (D::cs2 * G_ww))); // calculate psi
+    // van der Waals eqn
+    psi = std::sqrt(std::abs(c1 * rho - (c2/rho)/(1 - c4*rho) + c3*rho*rho)); 
+    // psi = rho;
+
+    rhoContribution[1] -=  w_2 * psi;
+    rhoContribution[2] -=  w_2 * psi;
+
+    rho = *lattice.get(iX  ,iY-1,iZ+1).getExternal(densityOffset);
+    // beta = b * rho / (T)4;
+    // p = rho * D::cs2 * ((T)1 + beta + std::pow(beta,2) - std::pow(beta,3)) / std::pow((1 - beta),3) - a * std::pow(rho,2);
+    // psi = std::sqrt(std::abs(2 * (p - D::cs2 * rho) / (D::cs2 * G_ww))); // calculate psi
+    // van der Waals eqn
+    psi = std::sqrt(std::abs(c1 * rho - (c2/rho)/(1 - c4*rho) + c3*rho*rho)); 
+    // psi = rho;
+
+    rhoContribution[1] -=  w_2 * psi;
+    rhoContribution[2] +=  w_2 * psi;
+
+    rho = *lattice.get(iX+1,iY  ,iZ  ).getExternal(densityOffset);
+    // beta = b * rho / (T)4;
+    // p = rho * D::cs2 * ((T)1 + beta + std::pow(beta,2) - std::pow(beta,3)) / std::pow((1 - beta),3) - a * std::pow(rho,2);
+    // psi = std::sqrt(std::abs(2 * (p - D::cs2 * rho) / (D::cs2 * G_ww))); // calculate psi
+    // van der Waals eqn
+    psi = std::sqrt(std::abs(c1 * rho - (c2/rho)/(1 - c4*rho) + c3*rho*rho)); 
+    // psi = rho;
+
+    rhoContribution[0] += w_1 *  psi;
+
+    rho = *lattice.get(iX  ,iY+1,iZ  ).getExternal(densityOffset);
+    // beta = b * rho / (T)4;
+    // p = rho * D::cs2 * ((T)1 + beta + std::pow(beta,2) - std::pow(beta,3)) / std::pow((1 - beta),3) - a * std::pow(rho,2);
+    // psi = std::sqrt(std::abs(2 * (p - D::cs2 * rho) / (D::cs2 * G_ww))); // calculate psi
+    // van der Waals eqn
+    psi = std::sqrt(std::abs(c1 * rho - (c2/rho)/(1 - c4*rho) + c3*rho*rho)); 
+    // psi = rho;
+
+    rhoContribution[1] += w_1 *  psi;
+
+    rho = *lattice.get(iX  ,iY  ,iZ+1).getExternal(densityOffset);
+    // beta = b * rho / (T)4;
+    // p = rho * D::cs2 * ((T)1 + beta + std::pow(beta,2) - std::pow(beta,3)) / std::pow((1 - beta),3) - a * std::pow(rho,2);
+    // psi = std::sqrt(std::abs(2 * (p - D::cs2 * rho) / (D::cs2 * G_ww))); // calculate psi
+    // van der Waals eqn
+    psi = std::sqrt(std::abs(c1 * rho - (c2/rho)/(1 - c4*rho) + c3*rho*rho)); 
+    // psi = rho;
+
+    rhoContribution[2] += w_1 *  psi;
+
+    rho = *lattice.get(iX+1,iY+1,iZ  ).getExternal(densityOffset);
+    // beta = b * rho / (T)4;
+    // p = rho * D::cs2 * ((T)1 + beta + std::pow(beta,2) - std::pow(beta,3)) / std::pow((1 - beta),3) - a * std::pow(rho,2);
+    // psi = std::sqrt(std::abs(2 * (p - D::cs2 * rho) / (D::cs2 * G_ww))); // calculate psi
+    // van der Waals eqn
+    psi = std::sqrt(std::abs(c1 * rho - (c2/rho)/(1 - c4*rho) + c3*rho*rho)); 
+    // psi = rho;
+
+    rhoContribution[0] += w_2 *  psi;
+    rhoContribution[1] += w_2 *  psi;
+
+    rho = *lattice.get(iX+1,iY-1,iZ  ).getExternal(densityOffset);
+    // beta = b * rho / (T)4;
+    // p = rho * D::cs2 * ((T)1 + beta + std::pow(beta,2) - std::pow(beta,3)) / std::pow((1 - beta),3) - a * std::pow(rho,2);
+    // psi = std::sqrt(std::abs(2 * (p - D::cs2 * rho) / (D::cs2 * G_ww))); // calculate psi
+    // van der Waals eqn
+    psi = std::sqrt(std::abs(c1 * rho - (c2/rho)/(1 - c4*rho) + c3*rho*rho)); 
+    // psi = rho;
+
+    rhoContribution[0] += w_2 *  psi;
+    rhoContribution[1] -= w_2 *  psi;
+
+    rho = *lattice.get(iX+1,iY  ,iZ+1).getExternal(densityOffset);
+    // beta = b * rho / (T)4;
+    // p = rho * D::cs2 * ((T)1 + beta + std::pow(beta,2) - std::pow(beta,3)) / std::pow((1 - beta),3) - a * std::pow(rho,2);
+    // psi = std::sqrt(std::abs(2 * (p - D::cs2 * rho) / (D::cs2 * G_ww))); // calculate psi
+    // van der Waals eqn
+    psi = std::sqrt(std::abs(c1 * rho - (c2/rho)/(1 - c4*rho) + c3*rho*rho)); 
+    // psi = rho;
+
+    rhoContribution[0] += w_2 *  psi;
+    rhoContribution[2] += w_2 *  psi;
+
+    rho = *lattice.get(iX+1,iY  ,iZ-1).getExternal(densityOffset);
+    // beta = b * rho / (T)4;
+    // p = rho * D::cs2 * ((T)1 + beta + std::pow(beta,2) - std::pow(beta,3)) / std::pow((1 - beta),3) - a * std::pow(rho,2);
+    // psi = std::sqrt(std::abs(2 * (p - D::cs2 * rho) / (D::cs2 * G_ww))); // calculate psi
+    // van der Waals eqn
+    psi = std::sqrt(std::abs(c1 * rho - (c2/rho)/(1 - c4*rho) + c3*rho*rho)); 
+    // psi = rho;
+
+    rhoContribution[0] += w_2 *  psi;
+    rhoContribution[2] -= w_2 *  psi;
+
+    rho = *lattice.get(iX  ,iY+1,iZ+1).getExternal(densityOffset);
+    // beta = b * rho / (T)4;
+    // p = rho * D::cs2 * ((T)1 + beta + std::pow(beta,2) - std::pow(beta,3)) / std::pow((1 - beta),3) - a * std::pow(rho,2);
+    // psi = std::sqrt(std::abs(2 * (p - D::cs2 * rho) / (D::cs2 * G_ww))); // calculate psi
+    // van der Waals eqn
+    psi = std::sqrt(std::abs(c1 * rho - (c2/rho)/(1 - c4*rho) + c3*rho*rho)); 
+    // psi = rho;
+
+    rhoContribution[1] += w_2 *  psi;
+    rhoContribution[2] += w_2 *  psi;
+
+    rho = *lattice.get(iX  ,iY+1,iZ-1).getExternal(densityOffset);
+    // beta = b * rho / (T)4;
+    // p = rho * D::cs2 * ((T)1 + beta + std::pow(beta,2) - std::pow(beta,3)) / std::pow((1 - beta),3) - a * std::pow(rho,2);
+    // psi = std::sqrt(std::abs(2 * (p - D::cs2 * rho) / (D::cs2 * G_ww))); // calculate psi
+    // van der Waals eqn
+    psi = std::sqrt(std::abs(c1 * rho - (c2/rho)/(1 - c4*rho) + c3*rho*rho)); 
+    // psi = rho;
+
+    rhoContribution[1] += w_2 *  psi;
+    rhoContribution[2] -= w_2 *  psi;
+
+    }
+
+    else{
+    plint ii = 1;
+    rho = *lattice.get(iX-1,iY  ,iZ  ).getExternal(densityOffset);
+    rhoContribution[0] = - w_1 * rho;
+    
+    // if(iX == 50 && iY == 50)
+    // {
+    //     std::cout << "iZ : " << iZ << std::endl;
+    //     std::cout << "idx : " << ii << std::endl;
+    //     ++ii;
+    //     std::cout << "rho in O2 : " << rho << std::endl;
+    // std::cout << "rhoContribution[x] in O2 : " << rhoContribution[0] << std::endl;
+    // std::cout << "rhoContribution[y] in O2 : " << rhoContribution[1] << std::endl;
+    // std::cout << "rhoContribution[z] in O2 : " << rhoContribution[2] << std::endl;
+    // }
+    rho = *lattice.get(iX  ,iY-1,iZ  ).getExternal(densityOffset);
+    rhoContribution[1] = - w_1 * rho;
+    
+    // if(iX == 50 && iY == 50)
+    // {
+    //     std::cout << "iZ : " << iZ << std::endl;
+    //     std::cout << "idx : " << ii << std::endl;
+    //     ++ii;
+    //     std::cout << "rho in O2 : " << rho << std::endl;
+    // std::cout << "rhoContribution[x] in O2 : " << rhoContribution[0] << std::endl;
+    // std::cout << "rhoContribution[y] in O2 : " << rhoContribution[1] << std::endl;
+    // std::cout << "rhoContribution[z] in O2 : " << rhoContribution[2] << std::endl;
+    // }
+    rho = *lattice.get(iX  ,iY  ,iZ-1).getExternal(densityOffset);
+    rhoContribution[2] = - w_1 * rho;
+    
+    // if(iX == 50 && iY == 50)
+    // {
+    //     std::cout << "iZ : " << iZ << std::endl;
+    //     std::cout << "idx : " << ii << std::endl;
+    //     ++ii;
+    //     std::cout << "rho in O2 : " << rho << std::endl;
+    // std::cout << "rhoContribution[x] in O2 : " << rhoContribution[0] << std::endl;
+    // std::cout << "rhoContribution[y] in O2 : " << rhoContribution[1] << std::endl;
+    // std::cout << "rhoContribution[z] in O2 : " << rhoContribution[2] << std::endl;
+    // }
+
+    rho = *lattice.get(iX-1,iY-1,iZ  ).getExternal(densityOffset);
+    rhoContribution[0] -=  w_2 * rho;
+    rhoContribution[1] -=  w_2 * rho;
+    
+    
+    // if(iX == 50 && iY == 50)
+    // {
+    //     std::cout << "iZ : " << iZ << std::endl;
+    //     std::cout << "idx : " << ii << std::endl;
+    //     ++ii;
+    //     std::cout << "rho in O2 : " << rho << std::endl;
+    // std::cout << "rhoContribution[x] in O2 : " << rhoContribution[0] << std::endl;
+    // std::cout << "rhoContribution[y] in O2 : " << rhoContribution[1] << std::endl;
+    // std::cout << "rhoContribution[z] in O2 : " << rhoContribution[2] << std::endl;
+    // }
+    rho = *lattice.get(iX-1,iY+1,iZ  ).getExternal(densityOffset);
+    rhoContribution[0] -=  w_2 * rho;
+    rhoContribution[1] +=  w_2 * rho;
+    
+    
+    // if(iX == 50 && iY == 50)
+    // {
+    //     std::cout << "iZ : " << iZ << std::endl;
+    //     std::cout << "idx : " << ii << std::endl;
+    //     ++ii;
+    //     std::cout << "rho in O2 : " << rho << std::endl;
+    // std::cout << "rhoContribution[x] in O2 : " << rhoContribution[0] << std::endl;
+    // std::cout << "rhoContribution[y] in O2 : " << rhoContribution[1] << std::endl;
+    // std::cout << "rhoContribution[z] in O2 : " << rhoContribution[2] << std::endl;
+    // }
+    rho = *lattice.get(iX-1,iY  ,iZ-1).getExternal(densityOffset);
+    rhoContribution[0] -=  w_2 * rho;
+    rhoContribution[2] -=  w_2 * rho;
+    
+    // if(iX == 50 && iY == 50)
+    // {
+    //     std::cout << "iZ : " << iZ << std::endl;
+    //     std::cout << "idx : " << ii << std::endl;
+    //     ++ii;
+    //     std::cout << "rho in O2 : " << rho << std::endl;
+    // std::cout << "rhoContribution[x] in O2 : " << rhoContribution[0] << std::endl;
+    // std::cout << "rhoContribution[y] in O2 : " << rhoContribution[1] << std::endl;
+    // std::cout << "rhoContribution[z] in O2 : " << rhoContribution[2] << std::endl;
+    // }
+
+    rho = *lattice.get(iX-1,iY  ,iZ+1).getExternal(densityOffset);
+    rhoContribution[0] -=  w_2 * rho;
+    rhoContribution[2] +=  w_2 * rho;
+    
+    // if(iX == 50 && iY == 50)
+    // {
+    //     std::cout << "iZ : " << iZ << std::endl;
+    //     std::cout << "idx : " << ii << std::endl;
+    //     ++ii;
+    //     std::cout << "rho in O2 : " << rho << std::endl;
+    // std::cout << "rhoContribution[x] in O2 : " << rhoContribution[0] << std::endl;
+    // std::cout << "rhoContribution[y] in O2 : " << rhoContribution[1] << std::endl;
+    // std::cout << "rhoContribution[z] in O2 : " << rhoContribution[2] << std::endl;
+    // }
+
+    rho = *lattice.get(iX  ,iY-1,iZ-1).getExternal(densityOffset);
+    rhoContribution[1] -=  w_2 * rho;
+    rhoContribution[2] -=  w_2 * rho;
+    
+    
+    // if(iX == 50 && iY == 50)
+    // {
+    //     std::cout << "iZ : " << iZ << std::endl;
+    //     std::cout << "idx : " << ii << std::endl;
+    //     ++ii;
+    //     std::cout << "rho in O2 : " << rho << std::endl;
+    // std::cout << "rhoContribution[x] in O2 : " << rhoContribution[0] << std::endl;
+    // std::cout << "rhoContribution[y] in O2 : " << rhoContribution[1] << std::endl;
+    // std::cout << "rhoContribution[z] in O2 : " << rhoContribution[2] << std::endl;
+    // }
+    rho = *lattice.get(iX  ,iY-1,iZ+1).getExternal(densityOffset);
+    rhoContribution[1] -=  w_2 * rho;
+    rhoContribution[2] +=  w_2 * rho;
+    
+    
+    // if(iX == 50 && iY == 50)
+    // {
+    //     std::cout << "iZ : " << iZ << std::endl;
+    //     std::cout << "idx : " << ii << std::endl;
+    //     ++ii;
+    //     std::cout << "rho in O2 : " << rho << std::endl;
+    // std::cout << "rhoContribution[x] in O2 : " << rhoContribution[0] << std::endl;
+    // std::cout << "rhoContribution[y] in O2 : " << rhoContribution[1] << std::endl;
+    // std::cout << "rhoContribution[z] in O2 : " << rhoContribution[2] << std::endl;
+    // }
+    rho = *lattice.get(iX+1,iY  ,iZ  ).getExternal(densityOffset);
+    rhoContribution[0] += w_1 *  rho;
+    
+    // if(iX == 50 && iY == 50)
+    // {
+    //     std::cout << "iZ : " << iZ << std::endl;
+    //     std::cout << "idx : " << ii << std::endl;
+    //     ++ii;
+    //     std::cout << "rho in O2 : " << rho << std::endl;
+    // std::cout << "rhoContribution[x] in O2 : " << rhoContribution[0] << std::endl;
+    // std::cout << "rhoContribution[y] in O2 : " << rhoContribution[1] << std::endl;
+    // std::cout << "rhoContribution[z] in O2 : " << rhoContribution[2] << std::endl;
+    // }
+
+    rho = *lattice.get(iX  ,iY+1,iZ  ).getExternal(densityOffset);
+    rhoContribution[1] += w_1 *  rho;
+    
+    
+    // if(iX == 50 && iY == 50)
+    // {
+    //     std::cout << "iZ : " << iZ << std::endl;
+    //     std::cout << "idx : " << ii << std::endl;
+    //     ++ii;
+    //     std::cout << "rho in O2 : " << rho << std::endl;
+    // std::cout << "rhoContribution[x] in O2 : " << rhoContribution[0] << std::endl;
+    // std::cout << "rhoContribution[y] in O2 : " << rhoContribution[1] << std::endl;
+    // std::cout << "rhoContribution[z] in O2 : " << rhoContribution[2] << std::endl;
+    // }
+    rho = *lattice.get(iX  ,iY  ,iZ+1).getExternal(densityOffset);
+    rhoContribution[2] += w_1 *  rho;
+    
+    // if(iX == 50 && iY == 50)
+    // {
+    //     std::cout << "iZ : " << iZ << std::endl;
+    //     std::cout << "idx : " << ii << std::endl;
+    //     ++ii;
+    //     std::cout << "rho in O2 : " << rho << std::endl;
+    // std::cout << "rhoContribution[x] in O2 : " << rhoContribution[0] << std::endl;
+    // std::cout << "rhoContribution[y] in O2 : " << rhoContribution[1] << std::endl;
+    // std::cout << "rhoContribution[z] in O2 : " << rhoContribution[2] << std::endl;
+    // }
+
+    rho = *lattice.get(iX+1,iY+1,iZ  ).getExternal(densityOffset);
+    rhoContribution[0] += w_2 *  rho;
+    rhoContribution[1] += w_2 *  rho;
+    
+    
+    // if(iX == 50 && iY == 50)
+    // {
+    //     std::cout << "iZ : " << iZ << std::endl;
+    //     std::cout << "idx : " << ii << std::endl;
+    //     ++ii;
+    //     std::cout << "rho in O2 : " << rho << std::endl;
+    // std::cout << "rhoContribution[x] in O2 : " << rhoContribution[0] << std::endl;
+    // std::cout << "rhoContribution[y] in O2 : " << rhoContribution[1] << std::endl;
+    // std::cout << "rhoContribution[z] in O2 : " << rhoContribution[2] << std::endl;
+    // }
+    rho = *lattice.get(iX+1,iY-1,iZ  ).getExternal(densityOffset);
+    rhoContribution[0] += w_2 *  rho;
+    rhoContribution[1] -= w_2 *  rho;
+    
+    
+    // if(iX == 50 && iY == 50)
+    // {
+    //     std::cout << "iZ : " << iZ << std::endl;
+    //     std::cout << "idx : " << ii << std::endl;
+    //     ++ii;
+    //     std::cout << "rho in O2 : " << rho << std::endl;
+    // std::cout << "rhoContribution[x] in O2 : " << rhoContribution[0] << std::endl;
+    // std::cout << "rhoContribution[y] in O2 : " << rhoContribution[1] << std::endl;
+    // std::cout << "rhoContribution[z] in O2 : " << rhoContribution[2] << std::endl;
+    // }
+    rho = *lattice.get(iX+1,iY  ,iZ+1).getExternal(densityOffset);
+    rhoContribution[0] += w_2 *  rho;
+    rhoContribution[2] += w_2 *  rho;
+    
+    // if(iX == 50 && iY == 50)
+    // {
+    //     std::cout << "iZ : " << iZ << std::endl;
+    //     std::cout << "idx : " << ii << std::endl;
+    //     ++ii;
+    //     std::cout << "rho in O2 : " << rho << std::endl;
+    // std::cout << "rhoContribution[x] in O2 : " << rhoContribution[0] << std::endl;
+    // std::cout << "rhoContribution[y] in O2 : " << rhoContribution[1] << std::endl;
+    // std::cout << "rhoContribution[z] in O2 : " << rhoContribution[2] << std::endl;
+    // }
+
+    rho = *lattice.get(iX+1,iY  ,iZ-1).getExternal(densityOffset);
+    rhoContribution[0] += w_2 *  rho;
+    rhoContribution[2] -= w_2 *  rho;
+    
+    // if(iX == 50 && iY == 50)
+    // {
+    //     std::cout << "iZ : " << iZ << std::endl;
+    //     std::cout << "idx : " << ii << std::endl;
+    //     ++ii;
+    //     std::cout << "rho in O2 : " << rho << std::endl;
+    // std::cout << "rhoContribution[x] in O2 : " << rhoContribution[0] << std::endl;
+    // std::cout << "rhoContribution[y] in O2 : " << rhoContribution[1] << std::endl;
+    // std::cout << "rhoContribution[z] in O2 : " << rhoContribution[2] << std::endl;
+    // }
+
+    rho = *lattice.get(iX  ,iY+1,iZ+1).getExternal(densityOffset);
+    rhoContribution[1] += w_2 *  rho;
+    rhoContribution[2] += w_2 *  rho;
+    
+    
+    // if(iX == 50 && iY == 50)
+    // {
+    //     std::cout << "iZ : " << iZ << std::endl;
+    //     std::cout << "idx : " << ii << std::endl;
+    //     ++ii;
+    //     std::cout << "rho in O2 : " << rho << std::endl;
+    // std::cout << "rhoContribution[x] in O2 : " << rhoContribution[0] << std::endl;
+    // std::cout << "rhoContribution[y] in O2 : " << rhoContribution[1] << std::endl;
+    // std::cout << "rhoContribution[z] in O2 : " << rhoContribution[2] << std::endl;
+    // }
+    rho = *lattice.get(iX  ,iY+1,iZ-1).getExternal(densityOffset);
+    rhoContribution[1] += w_2 *  rho;
+    rhoContribution[2] -= w_2 *  rho;
+    
+    
+    // if(iX == 50 && iY == 50)
+    // {
+    //     std::cout << "iZ : " << iZ << std::endl;
+    //     std::cout << "idx : " << ii << std::endl;
+    //     ++ii;
+    //     std::cout << "rho in O2 : " << rho << std::endl;
+    // std::cout << "rhoContribution[x] in O2 : " << rhoContribution[0] << std::endl;
+    // std::cout << "rhoContribution[y] in O2 : " << rhoContribution[1] << std::endl;
+    // std::cout << "rhoContribution[z] in O2 : " << rhoContribution[2] << std::endl;
+    // }
+    
+    }
+}
+
+
+/*
 static void shanChenPsiInteraction (
         BlockLattice3D<T,descriptors::ForcedShanChenD3Q19Descriptor>& lattice,
         Array<T,D::d>& rhoContribution,
@@ -203,6 +703,8 @@ static void shanChenPsiInteraction (
     enum {
         densityOffset  = D::ExternalField::densityBeginsAt
     };
+
+    std::cout << "G! : "  << G << std::endl;
 
     T rho;
     T p;
@@ -215,193 +717,195 @@ static void shanChenPsiInteraction (
     rho = *lattice.get(iX-1,iY  ,iZ  ).getExternal(densityOffset);
     psi = rho_0 * ((T)1 - std::exp(-rho/rho_0));
     rhoContribution[0] = -D::t[1] * psi;
-    if (iX == 1 && iY == 1 && iZ == 1){
-        std::cout << "iX: " << iX << " iY: " << iY << " iZ: " << iZ << std::endl;
-        std::cout << "rho: "  << rho << std::endl;
-        std::cout << "rho adress: "  << (T*)lattice.get(iX-1,iY  ,iZ  ).getExternal(densityOffset) << std::endl;
-        for (plint i=0;i<3;i++)
-        {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
-    }
+    // if (iX == 1 && iY == 1 && iZ == 1){
+    //     std::cout << "iX: " << iX << " iY: " << iY << " iZ: " << iZ << std::endl;
+    //     std::cout << "rho: "  << rho << std::endl;
+    //     std::cout << "rho adress: "  << (T*)lattice.get(iX-1,iY  ,iZ  ).getExternal(densityOffset) << std::endl;
+    //     for (plint i=0;i<3;i++)
+    //     {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
+    // }
 
     rho = *lattice.get(iX  ,iY-1,iZ  ).getExternal(densityOffset);
     psi = rho_0 * ((T)1 - std::exp(-rho/rho_0));
     rhoContribution[1] = -D::t[2] * psi;
-    if (iX == 1 && iY == 1 && iZ == 1){
-        std::cout << "rho: "  << rho << std::endl;
-        std::cout << "rho adress: "  << (T*)lattice.get(iX-1,iY  ,iZ  ).getExternal(densityOffset) << std::endl;
-        for (plint i=0;i<3;i++)
-        {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
-    }
+    // if (iX == 1 && iY == 1 && iZ == 1){
+    //     std::cout << "rho: "  << rho << std::endl;
+    //     std::cout << "rho adress: "  << (T*)lattice.get(iX-1,iY  ,iZ  ).getExternal(densityOffset) << std::endl;
+    //     for (plint i=0;i<3;i++)
+    //     {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
+    // }
 
     rho = *lattice.get(iX  ,iY  ,iZ-1).getExternal(densityOffset);
     psi = rho_0 * ((T)1 - std::exp(-rho/rho_0));
     rhoContribution[2] = -D::t[3] * psi;
-    if (iX == 1 && iY == 1 && iZ == 1){
-        std::cout << "rho: "  << rho << std::endl;
-        for (plint i=0;i<3;i++)
-        {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
-    }
+    // if (iX == 1 && iY == 1 && iZ == 1){
+    //     std::cout << "rho: "  << rho << std::endl;
+    //     for (plint i=0;i<3;i++)
+    //     {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
+    // }
 
     rho = *lattice.get(iX-1,iY-1,iZ  ).getExternal(densityOffset);
     psi = rho_0 * ((T)1 - std::exp(-rho/rho_0));
     rhoContribution[0] -= D::t[4] * psi;
     rhoContribution[1] -= D::t[4] * psi;
-    if (iX == 1 && iY == 1 && iZ == 1){
-        std::cout << "rho: "  << rho << std::endl;
-        for (plint i=0;i<3;i++)
-        {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
-    }
+    // if (iX == 1 && iY == 1 && iZ == 1){
+    //     std::cout << "rho: "  << rho << std::endl;
+    //     for (plint i=0;i<3;i++)
+    //     {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
+    // }
 
     rho = *lattice.get(iX-1,iY+1,iZ  ).getExternal(densityOffset);
     psi = rho_0 * ((T)1 - std::exp(-rho/rho_0));
     rhoContribution[0] -= D::t[5] * psi;
     rhoContribution[1] += D::t[5] * psi;
-    if (iX == 1 && iY == 1 && iZ == 1){
-        std::cout << "rho: "  << rho << std::endl;
-        for (plint i=0;i<3;i++)
-        {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
-    }
+    // if (iX == 1 && iY == 1 && iZ == 1){
+    //     std::cout << "rho: "  << rho << std::endl;
+    //     for (plint i=0;i<3;i++)
+    //     {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
+    // }
 
     rho = *lattice.get(iX-1,iY  ,iZ-1).getExternal(densityOffset);
     psi = rho_0 * ((T)1 - std::exp(-rho/rho_0));
     rhoContribution[0] -= D::t[6] * psi;
     rhoContribution[2] -= D::t[6] * psi;
-    if (iX == 1 && iY == 1 && iZ == 1){
-        std::cout << "rho: "  << rho << std::endl;
-        for (plint i=0;i<3;i++)
-        {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
-    }
+    // if (iX == 1 && iY == 1 && iZ == 1){
+    //     std::cout << "rho: "  << rho << std::endl;
+    //     for (plint i=0;i<3;i++)
+    //     {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
+    // }
 
     rho = *lattice.get(iX-1,iY  ,iZ+1).getExternal(densityOffset);
     psi = rho_0 * ((T)1 - std::exp(-rho/rho_0));
     rhoContribution[0] -= D::t[7] * psi;
     rhoContribution[2] += D::t[7] * psi;
-    if (iX == 1 && iY == 1 && iZ == 1){
-        std::cout << "rho: "  << rho << std::endl;
-        for (plint i=0;i<3;i++)
-        {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
-    }
+    // if (iX == 1 && iY == 1 && iZ == 1){
+    //     std::cout << "rho: "  << rho << std::endl;
+    //     for (plint i=0;i<3;i++)
+    //     {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
+    // }
 
     rho = *lattice.get(iX  ,iY-1,iZ-1).getExternal(densityOffset);
     psi = rho_0 * ((T)1 - std::exp(-rho/rho_0));
     rhoContribution[1] -= D::t[8] * psi;
     rhoContribution[2] -= D::t[8] * psi;
-    if (iX == 1 && iY == 1 && iZ == 1){
-        std::cout << "rho: "  << rho << std::endl;
-        for (plint i=0;i<3;i++)
-        {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
-    }
+    // if (iX == 1 && iY == 1 && iZ == 1){
+    //     std::cout << "rho: "  << rho << std::endl;
+    //     for (plint i=0;i<3;i++)
+    //     {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
+    // }
 
     rho = *lattice.get(iX  ,iY-1,iZ+1).getExternal(densityOffset);
     psi = rho_0 * ((T)1 - std::exp(-rho/rho_0));
     rhoContribution[1] -= D::t[9] * psi;
     rhoContribution[2] += D::t[9] * psi;
-if (iX == 1 && iY == 1 && iZ == 1){
-        std::cout << "rho: "  << rho << std::endl;
-        for (plint i=0;i<3;i++)
-        {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
-    }
+// if (iX == 1 && iY == 1 && iZ == 1){
+//         std::cout << "rho: "  << rho << std::endl;
+//         for (plint i=0;i<3;i++)
+//         {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
+//     }
 
     rho = *lattice.get(iX+1,iY  ,iZ  ).getExternal(densityOffset);
     psi = rho_0 * ((T)1 - std::exp(-rho/rho_0));
     rhoContribution[0] += D::t[10] * psi;
-    if (iX == 1 && iY == 1 && iZ == 1){
-        std::cout << "rho: "  << rho << std::endl;
-        for (plint i=0;i<3;i++)
-        {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
-    }
+    // if (iX == 1 && iY == 1 && iZ == 1){
+    //     std::cout << "rho: "  << rho << std::endl;
+    //     for (plint i=0;i<3;i++)
+    //     {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
+    // }
 
     rho = *lattice.get(iX  ,iY+1,iZ  ).getExternal(densityOffset);
     psi = rho_0 * ((T)1 - std::exp(-rho/rho_0));
     rhoContribution[1] += D::t[11] * psi;
-    if (iX == 1 && iY == 1 && iZ == 1){
-        std::cout << "rho: "  << rho << std::endl;
-        for (plint i=0;i<3;i++)
-        {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
-    }
+    // if (iX == 1 && iY == 1 && iZ == 1){
+    //     std::cout << "rho: "  << rho << std::endl;
+    //     for (plint i=0;i<3;i++)
+    //     {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
+    // }
 
     rho = *lattice.get(iX  ,iY  ,iZ+1).getExternal(densityOffset);
     psi = rho_0 * ((T)1 - std::exp(-rho/rho_0));
     rhoContribution[2] += D::t[12] * psi;
-    if (iX == 1 && iY == 1 && iZ == 1){
-        std::cout << "rho: "  << rho << std::endl;
-        for (plint i=0;i<3;i++)
-        {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
-    }
+    // if (iX == 1 && iY == 1 && iZ == 1){
+    //     std::cout << "rho: "  << rho << std::endl;
+    //     for (plint i=0;i<3;i++)
+    //     {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
+    // }
 
     rho = *lattice.get(iX+1,iY+1,iZ  ).getExternal(densityOffset);
     psi = rho_0 * ((T)1 - std::exp(-rho/rho_0));
     rhoContribution[0] += D::t[13] * psi;
     rhoContribution[1] += D::t[13] * psi;
-    if (iX == 1 && iY == 1 && iZ == 1){
-        std::cout << "rho: "  << rho << std::endl;
-        for (plint i=0;i<3;i++)
-        {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
-    }
+    // if (iX == 1 && iY == 1 && iZ == 1){
+    //     std::cout << "rho: "  << rho << std::endl;
+    //     for (plint i=0;i<3;i++)
+    //     {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
+    // }
 
     rho = *lattice.get(iX+1,iY-1,iZ  ).getExternal(densityOffset);
     psi = rho_0 * ((T)1 - std::exp(-rho/rho_0));
     rhoContribution[0] += D::t[14] * psi;
     rhoContribution[1] -= D::t[14] * psi;
-    if (iX == 1 && iY == 1 && iZ == 1){
-        std::cout << "rho: "  << rho << std::endl;
-        for (plint i=0;i<3;i++)
-        {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
-    }
+    // if (iX == 1 && iY == 1 && iZ == 1){
+    //     std::cout << "rho: "  << rho << std::endl;
+    //     for (plint i=0;i<3;i++)
+    //     {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
+    // }
 
     rho = *lattice.get(iX+1,iY  ,iZ+1).getExternal(densityOffset);
     psi = rho_0 * ((T)1 - std::exp(-rho/rho_0));
     rhoContribution[0] += D::t[15] * psi;
     rhoContribution[2] += D::t[15] * psi;
-    if (iX == 1 && iY == 1 && iZ == 1){
-        std::cout << "rho: "  << rho << std::endl;
-        for (plint i=0;i<3;i++)
-        {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
-    }
+    // if (iX == 1 && iY == 1 && iZ == 1){
+    //     std::cout << "rho: "  << rho << std::endl;
+    //     for (plint i=0;i<3;i++)
+    //     {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
+    // }
 
     rho = *lattice.get(iX+1,iY  ,iZ-1).getExternal(densityOffset);
     psi = rho_0 * ((T)1 - std::exp(-rho/rho_0));
     rhoContribution[0] += D::t[16] * psi;
     rhoContribution[2] -= D::t[16] * psi;
-    if (iX == 1 && iY == 1 && iZ == 1){
-        std::cout << "rho: "  << rho << std::endl;
-        for (plint i=0;i<3;i++)
-        {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
-    }
+    // if (iX == 1 && iY == 1 && iZ == 1){
+    //     std::cout << "rho: "  << rho << std::endl;
+    //     for (plint i=0;i<3;i++)
+    //     {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
+    // }
 
     rho = *lattice.get(iX  ,iY+1,iZ+1).getExternal(densityOffset);
     psi = rho_0 * ((T)1 - std::exp(-rho/rho_0));
     rhoContribution[1] += D::t[17] * psi;
     rhoContribution[2] += D::t[17] * psi;
-    if (iX == 1 && iY == 1 && iZ == 1){
-        std::cout << "rho: "  << rho << std::endl;
-        for (plint i=0;i<3;i++)
-        {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
-    }
+    // if (iX == 1 && iY == 1 && iZ == 1){
+    //     std::cout << "rho: "  << rho << std::endl;
+    //     for (plint i=0;i<3;i++)
+    //     {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
+    // }
 
     rho = *lattice.get(iX  ,iY+1,iZ-1).getExternal(densityOffset);
     psi = rho_0 * ((T)1 - std::exp(-rho/rho_0));
     rhoContribution[1] += D::t[18] * psi;
     rhoContribution[2] -= D::t[18] * psi;
-    if (iX == 1 && iY == 1 && iZ == 1){
-        std::cout << "rho: "  << rho << std::endl;
-        for (plint i=0;i<3;i++)
-        {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
-    }
+    // if (iX == 1 && iY == 1 && iZ == 1){
+    //     std::cout << "rho: "  << rho << std::endl;
+    //     for (plint i=0;i<3;i++)
+    //     {std::cout << "rhoCont" << i << " :" <<rhoContribution[i] << std::endl;}
+    // }
+
 
 
 
     
 
-    if (std::isnan(rhoContribution[0]*rhoContribution[1]*rhoContribution[2])){
-    // std::cout << "rho :" << rho << std::endl;
-    // std::cout << "psi :" << psi << std::endl;
-    std::cout << "iX: " << iX << " iY: " << iY << " iZ: " << iZ << std::endl;
-    // std::cout << "rhoContribution1 :" << rhoContribution[1] << std::endl;
-    // std::cout << "rhoContribution2 :" << rhoContribution[2] << std::endl;
-    }
+    // if (std::isnan(rhoContribution[0]*rhoContribution[1]*rhoContribution[2])){
+    // // std::cout << "rho :" << rho << std::endl;
+    // // std::cout << "psi :" << psi << std::endl;
+    // std::cout << "iX: " << iX << " iY: " << iY << " iZ: " << iZ << std::endl;
+    // // std::cout << "rhoContribution1 :" << rhoContribution[1] << std::endl;
+    // // std::cout << "rhoContribution2 :" << rhoContribution[2] << std::endl;
+    // }
 
 }
+*/
 
 };
 

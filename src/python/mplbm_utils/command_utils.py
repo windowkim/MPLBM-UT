@@ -164,6 +164,9 @@ def create_two_phase_input_file_2(args):
     # Write fluid data
     file.write('<fluids>\n')   
     file.write(f'\t<Gc> {args.Gc} </Gc>\n')
+    file.write(f'\t<G_oo> {args.G_oo} </G_oo>\n')
+    file.write(f'\t<G_ow> {args.G_ow} </G_ow>\n')
+    file.write(f'\t<G_ww> {args.G_ww} </G_ww>\n')
     file.write(f'\t<omega_f1> {args.omega_f1} </omega_f1>\n')
     file.write(f'\t<omega_f2> {args.omega_f2} </omega_f2>\n')
     file.write(f'\t<force_f1> {args.force_f1} </force_f1>\n')
